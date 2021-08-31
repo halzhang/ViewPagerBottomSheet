@@ -16,24 +16,10 @@
 
 package biz.laenger.android.vpbs;
 
-import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.annotation.RestrictTo;
-import androidx.annotation.VisibleForTesting;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.math.MathUtils;
-import androidx.customview.view.AbsSavedState;
-import androidx.core.view.ViewCompat;
-import androidx.viewpager.widget.ViewPager;
-import androidx.customview.widget.ViewDragHelper;
-import androidx.viewpager.widget.ViewPagerUtils;
-
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -47,6 +33,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.RestrictTo;
+import androidx.annotation.VisibleForTesting;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.math.MathUtils;
+import androidx.core.view.ViewCompat;
+import androidx.customview.view.AbsSavedState;
+import androidx.customview.widget.ViewDragHelper;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager.widget.ViewPagerUtils;
+
+import static androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP;
 
 /**
  * An interaction behavior plugin for a child view of {@link CoordinatorLayout} to make it work as
@@ -106,11 +105,14 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
      */
     public static final int STATE_HIDDEN = 5;
 
-    /** @hide */
+    /**
+     * @hide
+     */
     @RestrictTo(LIBRARY_GROUP)
     @IntDef({STATE_EXPANDED, STATE_COLLAPSED, STATE_DRAGGING, STATE_SETTLING, STATE_HIDDEN})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface State {}
+    public @interface State {
+    }
 
     /**
      * Peek at the 16:9 ratio keyline of its parent.
@@ -338,7 +340,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, V child,
-            View directTargetChild, View target, int nestedScrollAxes) {
+                                       View directTargetChild, View target, int nestedScrollAxes) {
         mLastNestedScrollDy = 0;
         mNestedScrolled = false;
         return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
@@ -346,7 +348,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
     @Override
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, V child, View target, int dx,
-            int dy, int[] consumed) {
+                                  int dy, int[] consumed) {
         View scrollingChild = mNestedScrollingChildRef.get();
         if (target != scrollingChild) {
             return;
@@ -423,7 +425,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
 
     @Override
     public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, V child, View target,
-            float velocityX, float velocityY) {
+                                    float velocityX, float velocityY) {
         return target == mNestedScrollingChildRef.get() &&
                 (mState != STATE_EXPANDED ||
                         super.onNestedPreFling(coordinatorLayout, child, target,
@@ -431,8 +433,10 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
     }
 
     void invalidateScrollingChild() {
-        final View scrollingChild = findScrollingChild(mViewRef.get());
-        mNestedScrollingChildRef = new WeakReference<>(scrollingChild);
+        if (mViewRef != null) {
+            final View scrollingChild = findScrollingChild(mViewRef.get());
+            mNestedScrollingChildRef = new WeakReference<>(scrollingChild);
+        }
     }
 
     /**
@@ -468,7 +472,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
      * Gets the height of the bottom sheet when it is collapsed.
      *
      * @return The height of the collapsed bottom sheet in pixels, or {@link #PEEK_HEIGHT_AUTO}
-     *         if the sheet is configured to peek automatically at 16:9 ratio keyline
+     * if the sheet is configured to peek automatically at 16:9 ratio keyline
      * @attr ref android.support.design.R.styleable#BottomSheetBehavior_Layout_behavior_peekHeight
      */
     public final int getPeekHeight() {
